@@ -45,7 +45,7 @@ namespace Opdracht
         public Adres Adres { get; set; }
         public int AdresId { get; set; }
         public List<Bestelling> Bestellingen { get; set; }
-        public List<ProductKlant> ProductKlant { get; set; }
+
 
         //Dit moet als er wel Fluent API wordt gebruikt
         public List<Review> GemaakteReviews { get; set; }
@@ -97,22 +97,24 @@ namespace Opdracht
         public string ArtikelNaam { get; set; }
         public int KlantId { get; set; } // hoeft niet
         public Klant Klant { get; set; } // hoeft niet
+
+        public List<ProductBestelling> ProductBestelling { get; set; }
     }
 
-    //veel op veel relatie met klant
+    //veel op veel relatie met Bestelling
     public class Product
     {
         public int Id { get; set; }
         public string Naam { get; set; }
-        public int KlantId { get; set; }
-        public List<ProductKlant> ProductKlant { get; set; }
+        public int BestellingId { get; set; }
+        public List<ProductBestelling> ProductBestelling { get; set; }
     }
-    //tussentabel product en klant
-    public class ProductKlant
+    //tussentabel product en Bestelling
+    public class ProductBestelling
     {
         public int Id { get; set; }
         public int KlantId { get; set; }
-        public Klant Klant { get; set; }
+        public Bestelling Bestelling { get; set; }
         public string ProductId { get; set; }
         public Product Product { get; set; }
     }

@@ -9,8 +9,8 @@ using Opdracht;
 namespace Opdracht.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20201122125335_Laatste")]
-    partial class Laatste
+    [Migration("20201122130706_Eerste")]
+    partial class Eerste
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -89,7 +89,7 @@ namespace Opdracht.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("KlantId")
+                    b.Property<int>("BestellingId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Naam")
@@ -100,10 +100,13 @@ namespace Opdracht.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("Opdracht.ProductKlant", b =>
+            modelBuilder.Entity("Opdracht.ProductBestelling", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("BestellingId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("KlantId")
@@ -117,11 +120,11 @@ namespace Opdracht.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("KlantId");
+                    b.HasIndex("BestellingId");
 
                     b.HasIndex("ProductId1");
 
-                    b.ToTable("ProductKlant");
+                    b.ToTable("ProductBestelling");
                 });
 
             modelBuilder.Entity("Opdracht.Review", b =>
@@ -188,19 +191,17 @@ namespace Opdracht.Migrations
                     b.Navigation("Adres");
                 });
 
-            modelBuilder.Entity("Opdracht.ProductKlant", b =>
+            modelBuilder.Entity("Opdracht.ProductBestelling", b =>
                 {
-                    b.HasOne("Opdracht.Klant", "Klant")
-                        .WithMany("ProductKlant")
-                        .HasForeignKey("KlantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Opdracht.Bestelling", "Bestelling")
+                        .WithMany("ProductBestelling")
+                        .HasForeignKey("BestellingId");
 
                     b.HasOne("Opdracht.Product", "Product")
-                        .WithMany("ProductKlant")
+                        .WithMany("ProductBestelling")
                         .HasForeignKey("ProductId1");
 
-                    b.Navigation("Klant");
+                    b.Navigation("Bestelling");
 
                     b.Navigation("Product");
                 });
@@ -227,20 +228,23 @@ namespace Opdracht.Migrations
                     b.Navigation("Klant");
                 });
 
+            modelBuilder.Entity("Opdracht.Bestelling", b =>
+                {
+                    b.Navigation("ProductBestelling");
+                });
+
             modelBuilder.Entity("Opdracht.Klant", b =>
                 {
                     b.Navigation("Bestellingen");
 
                     b.Navigation("GemaakteReviews");
 
-                    b.Navigation("ProductKlant");
-
                     b.Navigation("ReviewComments");
                 });
 
             modelBuilder.Entity("Opdracht.Product", b =>
                 {
-                    b.Navigation("ProductKlant");
+                    b.Navigation("ProductBestelling");
                 });
 #pragma warning restore 612, 618
         }

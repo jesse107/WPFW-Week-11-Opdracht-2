@@ -2,7 +2,7 @@
 
 namespace Opdracht.Migrations
 {
-    public partial class EersteMigration : Migration
+    public partial class Eerste : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace Opdracht.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Straat = table.Column<string>(type: "TEXT", nullable: true)
+                    Straatnaam = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,7 +26,7 @@ namespace Opdracht.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Naam = table.Column<string>(type: "TEXT", nullable: true),
-                    KlantId = table.Column<int>(type: "INTEGER", nullable: false)
+                    BestellingId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,7 +41,9 @@ namespace Opdracht.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Naam = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Achternaam = table.Column<string>(type: "TEXT", nullable: true),
-                    AdresId = table.Column<int>(type: "INTEGER", nullable: false)
+                    AdresId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Discriminator = table.Column<string>(type: "TEXT", nullable: false),
+                    KortingCode = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,26 +77,56 @@ namespace Opdracht.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductKlant",
+                name: "Review",
+                columns: table => new
+                {
+                    ReviewId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    Content = table.Column<string>(type: "TEXT", nullable: true),
+                    MakerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CommentId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CommenterId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Review", x => x.ReviewId);
+                    table.ForeignKey(
+                        name: "FK_Review_KlantTabel_CommenterId",
+                        column: x => x.CommenterId,
+                        principalTable: "KlantTabel",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Review_KlantTabel_MakerId",
+                        column: x => x.MakerId,
+                        principalTable: "KlantTabel",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductBestelling",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     KlantId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BestellingId = table.Column<int>(type: "INTEGER", nullable: true),
                     ProductId = table.Column<string>(type: "TEXT", nullable: true),
                     ProductId1 = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductKlant", x => x.Id);
+                    table.PrimaryKey("PK_ProductBestelling", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductKlant_KlantTabel_KlantId",
-                        column: x => x.KlantId,
-                        principalTable: "KlantTabel",
+                        name: "FK_ProductBestelling_Bestelling_BestellingId",
+                        column: x => x.BestellingId,
+                        principalTable: "Bestelling",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ProductKlant_Product_ProductId1",
+                        name: "FK_ProductBestelling_Product_ProductId1",
                         column: x => x.ProductId1,
                         principalTable: "Product",
                         principalColumn: "Id",
@@ -113,29 +145,42 @@ namespace Opdracht.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductKlant_KlantId",
-                table: "ProductKlant",
-                column: "KlantId");
+                name: "IX_ProductBestelling_BestellingId",
+                table: "ProductBestelling",
+                column: "BestellingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductKlant_ProductId1",
-                table: "ProductKlant",
+                name: "IX_ProductBestelling_ProductId1",
+                table: "ProductBestelling",
                 column: "ProductId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Review_CommenterId",
+                table: "Review",
+                column: "CommenterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Review_MakerId",
+                table: "Review",
+                column: "MakerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ProductBestelling");
+
+            migrationBuilder.DropTable(
+                name: "Review");
+
+            migrationBuilder.DropTable(
                 name: "Bestelling");
 
             migrationBuilder.DropTable(
-                name: "ProductKlant");
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "KlantTabel");
-
-            migrationBuilder.DropTable(
-                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "Adres");
